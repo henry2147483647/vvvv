@@ -32,9 +32,9 @@ export const Card: React.FC<CardProps> = ({
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 300, damping: 20 }}
       onClick={isPlayable ? onClick : undefined}
       className={`
-        relative w-24 h-36 sm:w-32 sm:h-48 rounded-xl border border-black/10 
+        relative w-20 h-28 sm:w-28 sm:h-40 rounded-xl border border-black/10 
         flex flex-col items-center justify-center cursor-pointer select-none
-        ${isFaceDown ? 'bg-indigo-700' : 'bg-white'}
+        ${isFaceDown ? 'bg-orange-600' : 'bg-white'}
         ${isPlayable ? 'ring-4 ring-yellow-400 shadow-xl' : 'shadow-md'}
         ${className}
       `}
@@ -42,7 +42,7 @@ export const Card: React.FC<CardProps> = ({
       {isFaceDown ? (
         <div className="w-full h-full flex items-center justify-center p-2">
           <div className="w-full h-full border-2 border-white/20 rounded-lg flex items-center justify-center">
-            <div className="text-white/30 text-4xl font-bold italic">T</div>
+            <div className="text-white/30 text-2xl font-bold italic">henry</div>
           </div>
         </div>
       ) : (

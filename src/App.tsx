@@ -20,8 +20,8 @@ export default function App() {
   });
 
   const [showSuitPicker, setShowSuitPicker] = useState(false);
-  const [pendingEightCard, setPendingEightCard] = useState<Card | null>(null);
-  const [message, setMessage] = useState("Welcome to Tina Crazy 8s!");
+  const [pendingWildCard, setPendingWildCard] = useState<Card | null>(null);
+  const [message, setMessage] = useState("Welcome to Tina Crazy 7s!");
 
   // Initialize Game
   const initGame = useCallback(() => {
@@ -29,8 +29,8 @@ export default function App() {
     const pHand = fullDeck.splice(0, 8);
     const aHand = fullDeck.splice(0, 8);
     
-    // Find a non-8 card for the start
-    let firstDiscardIndex = fullDeck.findIndex(c => c.rank !== Rank.EIGHT);
+    // Find a non-7 card for the start
+    let firstDiscardIndex = fullDeck.findIndex(c => c.rank !== Rank.SEVEN);
     if (firstDiscardIndex === -1) firstDiscardIndex = 0;
     const firstDiscard = fullDeck.splice(firstDiscardIndex, 1)[0];
 
@@ -73,10 +73,10 @@ export default function App() {
 
         if (playableCards.length > 0) {
           // AI plays a card
-          // Prefer non-8s if possible, or play 8 if nothing else
-          const cardToPlay = playableCards.find(c => c.rank !== Rank.EIGHT) || playableCards[0];
+          // Prefer non-7s if possible, or play 7 if nothing else
+          const cardToPlay = playableCards.find(c => c.rank !== Rank.SEVEN) || playableCards[0];
           
-          if (cardToPlay.rank === Rank.EIGHT) {
+          if (cardToPlay.rank === Rank.SEVEN) {
             // AI picks most frequent suit in hand
             const suitCounts = state.aiHand.reduce((acc, c) => {
               acc[c.suit] = (acc[c.suit] || 0) + 1;
@@ -86,7 +86,7 @@ export default function App() {
             const bestSuit = (Object.keys(suitCounts) as Suit[]).sort((a, b) => suitCounts[b] - suitCounts[a])[0] || Suit.HEARTS;
             
             playCard('ai', cardToPlay, bestSuit);
-            setMessage(`AI played an 8 and chose ${bestSuit}!`);
+            setMessage(`AI played a 7 and chose ${bestSuit}!`);
           } else {
             playCard('ai', cardToPlay);
             setMessage(`AI played ${cardToPlay.rank} of ${cardToPlay.suit}.`);
@@ -141,8 +141,8 @@ export default function App() {
   const handlePlayerCardClick = (card: Card) => {
     if (state.turn !== 'player' || state.status !== 'playing') return;
 
-    if (card.rank === Rank.EIGHT) {
-      setPendingEightCard(card);
+    if (card.rank === Rank.SEVEN) {
+      setPendingWildCard(card);
       setShowSuitPicker(true);
     } else if (isValidMove(card, state.currentSuit!, state.currentRank!)) {
       playCard('player', card);
@@ -151,9 +151,9 @@ export default function App() {
   };
 
   const handleSuitSelect = (suit: Suit) => {
-    if (pendingEightCard) {
-      playCard('player', pendingEightCard, suit);
-      setPendingEightCard(null);
+    if (pendingWildCard) {
+      playCard('player', pendingWildCard, suit);
+      setPendingWildCard(null);
       setShowSuitPicker(false);
       setMessage(`You chose ${suit}!`);
     }
@@ -165,13 +165,13 @@ export default function App() {
       <header className="p-4 flex justify-between items-center bg-black/20 backdrop-blur-md border-b border-white/10">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center font-display font-black text-2xl italic shadow-lg">T</div>
-          <h1 className="text-xl font-display font-bold tracking-tight">Tina Crazy 8s</h1>
+          <h1 className="text-xl font-display font-bold tracking-tight">Tina Crazy 7s</h1>
         </div>
         
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 bg-white/10 rounded-full text-sm font-medium">
             <Info size={16} />
-            <span>Match Suit or Rank. 8 is Wild!</span>
+            <span>Match Suit or Rank. 7 is Wild!</span>
           </div>
           <button 
             onClick={initGame}
@@ -186,20 +186,20 @@ export default function App() {
       {/* Main Game Area */}
       <main className="flex-1 relative p-4 flex flex-col items-center justify-between max-w-6xl mx-auto w-full">
         
-        {/* AI Hand */}
+        {/* Player Hand */}
         <div className="w-full flex flex-col items-center">
-          <div className="flex items-center gap-2 mb-4 text-white/60">
-            <Cpu size={18} />
-            <span className="text-sm font-semibold uppercase tracking-wider">AI Opponent ({state.aiHand.length})</span>
+          <div className="flex items-center gap-2 mb-2 text-white/60">
+            <User size={18} />
+            <span className="text-sm font-semibold uppercase tracking-wider">Your Hand ({state.playerHand.length})</span>
           </div>
-          <div className="flex -space-x-12 sm:-space-x-16 overflow-visible">
-            {state.aiHand.map((card, i) => (
+          <div className="flex -space-x-8 sm:-space-x-12 hover:space-x-2 transition-all duration-300 p-2">
+            {state.playerHand.map((card, i) => (
               <CardComponent 
                 key={card.id} 
                 card={card} 
-                isFaceDown 
                 index={i}
-                className="scale-75 sm:scale-90"
+                isPlayable={state.turn === 'player' && isValidMove(card, state.currentSuit!, state.currentRank!)}
+                onClick={() => handlePlayerCardClick(card)}
               />
             ))}
           </div>
@@ -213,13 +213,13 @@ export default function App() {
             <div 
               onClick={() => state.turn === 'player' && drawCard('player')}
               className={`
-                relative w-24 h-36 sm:w-32 sm:h-48 rounded-xl border-2 border-white/20 
+                relative w-20 h-28 sm:w-28 sm:h-40 rounded-xl border-2 border-white/20 
                 flex items-center justify-center cursor-pointer transition-transform
                 ${state.turn === 'player' ? 'hover:scale-105 active:scale-95' : 'opacity-50 cursor-not-allowed'}
-                bg-indigo-800 shadow-2xl
+                bg-orange-700 shadow-2xl
               `}
             >
-              <div className="text-white/20 text-4xl font-black italic">T</div>
+              <div className="text-white/20 text-2xl font-black italic">henry</div>
               <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs font-bold text-white/40 uppercase">
                 Draw ({state.deck.length})
               </div>
@@ -260,20 +260,20 @@ export default function App() {
           </motion.div>
         </div>
 
-        {/* Player Hand */}
-        <div className="w-full flex flex-col items-center">
+        {/* AI Hand */}
+        <div className="w-full flex flex-col items-center pb-12 sm:pb-16">
           <div className="flex items-center gap-2 mb-4 text-white/60">
-            <User size={18} />
-            <span className="text-sm font-semibold uppercase tracking-wider">Your Hand ({state.playerHand.length})</span>
+            <Cpu size={18} />
+            <span className="text-sm font-semibold uppercase tracking-wider">AI Opponent ({state.aiHand.length})</span>
           </div>
-          <div className="flex -space-x-12 sm:-space-x-16 hover:space-x-2 transition-all duration-300 p-4">
-            {state.playerHand.map((card, i) => (
+          <div className="flex -space-x-8 sm:-space-x-12 overflow-visible">
+            {state.aiHand.map((card, i) => (
               <CardComponent 
                 key={card.id} 
                 card={card} 
+                isFaceDown 
                 index={i}
-                isPlayable={state.turn === 'player' && isValidMove(card, state.currentSuit!, state.currentRank!)}
-                onClick={() => handlePlayerCardClick(card)}
+                className="scale-75 sm:scale-90"
               />
             ))}
           </div>

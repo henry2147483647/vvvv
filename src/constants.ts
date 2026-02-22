@@ -31,7 +31,7 @@ export const shuffle = (deck: Card[]): Card[] => {
 };
 
 export const isValidMove = (card: Card, currentSuit: Suit, currentRank: Rank): boolean => {
-  if (card.rank === Rank.EIGHT) return true;
+  if (card.rank === Rank.SEVEN) return true;
   return card.suit === currentSuit || card.rank === currentRank;
 };
 

@@ -1,6 +1,6 @@
-# Tina Crazy 8s 🃏
+# Tina Crazy 7s 🃏
 
-一个基于 React + Tailwind CSS + Framer Motion 构建的经典“疯狂 8 点”纸牌游戏。
+一个基于 React + Tailwind CSS + Framer Motion 构建的经典“疯狂 7 点”纸牌游戏。
 
 ## 🚀 部署到 Vercel 指南
 
